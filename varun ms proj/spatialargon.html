@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Spatialized Argon</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+        <meta name="arenabled" />	
+</head>
+<body>
+	<script src="http://argon.gatech.edu/argon_o.js"></script>
+	<p style="color: #0000FF; font-size: 24pt">
+	<br>
+	<a href="#" onclick="play()">Play</a>
+	</p>
+<script>
+		var ctx; //audio context
+		//init the sound system
+		
+		function initSound() {
+			console.log("in init");
+			try {
+				ctx = new webkitAudioContext(); 
+			} catch(e) {
+				alert('you need webaudio support');
+			}
+		}
+initSound();		
+var mainVolume = ctx.createGainNode();
+var sound = {};
+sound.source = ctx.createBufferSource();
+sound.volume = ctx.createGainNode();
+sound.panner = ctx.createPanner();
+
+sound.source.connect(sound.volume);
+sound.volume.connect(sound.panner);
+sound.panner.connect(mainVolume);
+mainVolume.connect(ctx.destination);
+
+// Make the sound source loop.
+sound.source.loop = true;
+
+// Load a sound file using an ArrayBuffer XMLHttpRequest.
+var request = new XMLHttpRequest();
+request.open("GET", "sounds/sound2.mp3", true);
+request.responseType = "arraybuffer";
+request.onload = function(e) {
+
+  // Create a buffer from the response ArrayBuffer.
+  var buffer = ctx.createBuffer(this.response, false);
+  sound.buffer = buffer;
+
+  // Make the sound source use the buffer and start playing it.
+  sound.source.buffer = sound.buffer;
+};
+request.send();
+		
+		function play()
+		{sound.source.noteOn(ctx.currentTime);
+		}
+		
+		 var app = {
+		
+             frameMarker25:null,//  continuos marker -  trackedObject25
+			 fwd_dice: null, //trackedObject25
+			 mydiv: null,
+			 camera : null,
+			 prevtime: null,
+            
+            _createElement : function(color, text)
+            {
+                var divEl = document.createElement("div");
+                divEl.style.width   = "50px";
+                divEl.style.height  = "50px";
+                divEl.style.backgroundColor = color;
+                divEl.style.fontSize = "15px";
+                divEl.style.fontFamily = "Arial";
+                divEl.innerText = text;
+                divEl.style.overflow = "visible";
+                
+                return divEl;
+            }, 
+            
+            _createLabelCssObject : function(el)
+            {
+                var cssObject = new THREE.CSSObject(el);
+                cssObject.width = 50;
+                cssObject.height = 50;
+                cssObject.position.x = 0.0;
+                cssObject.position.y = 0.0;
+                cssObject.position.z = 0.0;
+                return cssObject;
+            },
+            
+            createFwdMarker : function(color)
+            {
+                
+                var label;
+                var cssObject;
+                
+                /** create a FrameMarker **/
+                frameMarker25   = new ARGON.FrameMarkerTarget (25, "FrameMarker25", 50);
+                
+                /** create a TrackedObject **/
+                fwd_dice = new ARGON.TrackedObject();
+                
+                /** bind TrackedObject to FrameMarkerTarget **/
+                fwd_dice.setTarget(frameMarker25);
+                
+                /** create a default label **/
+                label       = app._createElement(color, "");
+                
+                /** create a CSSObject container with the label **/
+                cssObject   = app._createLabelCssObject(label);
+                
+                /** adding a custom property to the trackedObject */
+                fwd_dice.label = label;
+                
+                /** add the CSSObject to the TrackedObject, centered on the Target **/
+                fwd_dice.add(cssObject);
+            },
+			
+            onRender: function(time) {
+				
+				var marker;
+                var cam;
+                var prevmarker;
+				var prevcam;
+				
+                    marker = fwd_dice.threeObject3D.matrix.decompose()[0];
+                    cam = camera.matrix.decompose()[0];
+                    var cameraDist = marker.distanceTo(cam);
+					fwd_dice.label.innerText=cameraDist.toFixed(4);
+					sound.panner.setPosition(marker.x, marker.y, marker.z);
+					ctx.listener.setPosition(cam.x, cam.y, cam.z);	
+				
+					if(prevmarker!= null && prevcam!=null)
+					{
+					var dt=time-prevtime;
+					var dx=marker.x-prevmarker.x, dy=marker.y-prevmarker.y, dz=marker.z-prevmarker.z;
+					sound.panner.setVelocity(dx/dt, dy/dt, dz/dt);
+					
+					var cx=cam.x-prevcam.x, cy=cam.y-prevcam.y, cz=cam.z-prevcam.z;
+					ctx.listener.setVelocity(cx/dt, cy/dt, cz/dt);
+					}
+					
+					prevmarker=marker;
+					prevcam=cam;
+					prevtime=time;
+				
+            },
+			
+            onArgonReady: function() {
+				camera = ARGON.threeCamera;
+                app.createFwdMarker("green");
+				ARGON.onRender = app.onRender;
+            }
+			
+           };
+	    document.addEventListener("AR.ArgonReadyEvent", app.onArgonReady);
+			
+
+</script>	
+</body>
+</html>		

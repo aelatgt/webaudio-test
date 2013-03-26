@@ -1,0 +1,147 @@
+		
+<html>
+<head></head>
+<body>
+<script src="js/three.js"></script>
+<script src="js/THREEx.KeyboardState.js"></script>
+
+	<p style="color: #0000FF; font-size: 24pt">
+	<br>
+	<a href="#" onclick="play()">Play</a>
+	</p>
+<script>
+		var ctx; //audio context
+		//init the sound system
+		
+		function initSound() {
+			console.log("in init");
+			try {
+				ctx = new webkitAudioContext(); 
+			} catch(e) {
+				alert('you need webaudio support');
+			}
+		}
+initSound();		
+var mainVolume = ctx.createGainNode();
+var sound = {};
+sound.source = ctx.createBufferSource();
+sound.volume = ctx.createGainNode();
+sound.panner = ctx.createPanner();
+
+sound.source.connect(sound.volume);
+sound.volume.connect(sound.panner);
+sound.panner.connect(mainVolume);
+mainVolume.connect(ctx.destination);
+
+// Make the sound source loop.
+sound.source.loop = true;
+
+// Load a sound file using an ArrayBuffer XMLHttpRequest.
+var request = new XMLHttpRequest();
+request.open("GET", "sounds/sound2.mp3", true);
+request.responseType = "arraybuffer";
+request.onload = function(e) {
+
+  // Create a buffer from the response ArrayBuffer.
+  var buffer = ctx.createBuffer(this.response, false);
+  sound.buffer = buffer;
+
+  // Make the sound source use the buffer and start playing it.
+  sound.source.buffer = sound.buffer;
+};
+request.send();
+		
+		function play()
+		{sound.source.noteOn(ctx.currentTime);
+		}
+		
+// standard global variables
+var container, scene, camera, renderer, controls, stats;
+var keyboard = new THREEx.KeyboardState();
+var clock = new THREE.Clock();
+// custom global variables
+
+var MovingCube;
+
+init();
+animate();
+
+function init() 
+{
+	
+	// SCENE
+	scene = new THREE.Scene();
+	// CAMERA
+	camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+	scene.add(camera);
+	camera.lookAt(scene.position);	
+	// RENDERER
+	renderer = new THREE.WebGLRenderer( {antialias:true} );
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	// FLOOR
+	var floorMaterial = new THREE.MeshBasicMaterial( { color: 0x41F7FA } );
+	var floorGeometry = new THREE.PlaneGeometry(300, 300, 10, 10);
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.y=-25;
+	floor.rotation.x = -Math.PI/2;
+	floor.rotation.z=180;
+	scene.add(floor);
+
+	
+		var geometry = new THREE.CubeGeometry(5,5,5); 
+		var material = new THREE.MeshBasicMaterial({color: 0x00ff00}); 
+		MovingCube = new THREE.Mesh(geometry, material); 
+		MovingCube.position.set(0,-20,-80);
+		scene.add( MovingCube );	
+
+}
+
+
+function animate() 
+{
+    requestAnimationFrame( animate );
+	render();		
+	update();
+}
+
+function update()
+{
+	var delta = clock.getDelta(); // seconds.
+	var moveDistance = 50 * delta; // 50 pixels per second
+
+	var pold = MovingCube.matrixWorld.getPosition();
+	if ( keyboard.pressed("left") )
+		MovingCube.position.x -= moveDistance;
+	if ( keyboard.pressed("right") )
+		MovingCube.position.x += moveDistance;
+	if ( keyboard.pressed("up") )
+		MovingCube.position.z -= moveDistance;
+	if ( keyboard.pressed("down") )
+		MovingCube.position.z += moveDistance;
+		
+	var p = MovingCube.matrixWorld.getPosition();
+	sound.panner.setPosition(p.x, p.y, p.z);
+	var dx=p.x-pold.x, dy=p.y-pold.y, dz=p.z-pold.z;
+	sound.panner.setVelocity(dx/delta, dy/delta, dz/delta);
+	
+	var q = camera.matrixWorld.getPosition();
+	ctx.listener.setPosition(q.x, q.y, q.z);	
+}
+
+function render() 
+{
+	renderer.render( scene, camera );
+	window.addEventListener( 'resize', onWindowResize, false );
+}
+
+function onWindowResize() 
+{
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+}		
+
+</script>	
+</body>
+</html>		

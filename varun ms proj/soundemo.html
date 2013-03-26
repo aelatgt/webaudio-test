@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Sound Manager App</title>
+		<link rel="apple-touch-icon" href="assets/sample_icon_57x57.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+        <meta name="arenabled" />
+		
+	<h1>Sound Demo</h1>
+	</head>
+	<body>
+	<script src="http://argon.gatech.edu/argon_o.js"></script>
+	<script src="jslog/jslog.js"></script>
+	<script src="soundmanager.js"></script>
+    <script>
+	window.addEventListener('load',SoundManager.init,false);
+	
+        var myAppController =
+        {
+            onArgonReady : function()
+            {
+                    
+            },
+        };
+            
+		document.addEventListener("AR.ArgonReadyEvent", myAppController.onArgonReady);
+	</script>	
+		<p style="color: #0000FF; font-size: 24pt">
+		<br>
+		Alert
+		<a href="#" onclick="SoundManager.createAlert('sounds/sound4.wav')">Play</a>
+		<a href="#" onclick="SoundManager.stopA()">Stop</a>
+		<br>
+		Notification
+		<a href="#" onclick="SoundManager.createNotification('sounds/sound4.wav')">Play</a>
+		<a href="#" onclick="SoundManager.stopN()">Stop</a>
+		<br>
+		Update
+		<a href="#" onclick="SoundManager.createUpdate('sounds/sound3.wav')">Play</a>
+		<a href="#" onclick="SoundManager.stopU()">Stop</a>
+		<br>
+		Awareness
+		<a href="#" onclick="SoundManager.createAwareness('sounds/sound3.wav')">Play</a>
+		<a href="#" onclick="SoundManager.stopAw()">Stop</a>
+		<br>
+		Speech
+		<a href="#" onclick="SoundManager.createSpeech('sounds/sound2.mp3')">Play</a>
+		<a href="#" onclick="SoundManager.stopS()">Stop</a>
+		<br>
+	</p>
+</body>
+</html>
+
+	

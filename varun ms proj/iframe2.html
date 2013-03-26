@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <title>Web Audio App</title>
+	<link rel="apple-touch-icon" href="assets/sample_icon_57x57.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+        <meta name="arenabled" />
+	</head>
+	<body>
+	<script src="http://argon.gatech.edu/argon_o.js"></script>
+	<script src="SM2.js"></script>
+    <script>
+	window.addEventListener('load',loadFiles,false);
+		var myAppController =
+            {
+                onArgonReady : function()
+                {
+                    
+                },
+				
+                
+                
+            };
+            
+			document.addEventListener("AR.ArgonReadyEvent", myAppController.onArgonReady);
+
+		function loadFiles()
+		{init();
+		loadFile('sounds/sound3.wav');
+		}
+	
+	
+	</script>
+	<p style="color: #0000FF; font-size: 24pt">
+		<a href="#" onclick="play('sounds/sound3.wav')">Play2</a>    <a href="#" onclick="stop('sounds/sound3.wav')">Stop</a>
+	</p>
+</body>
+</html>
