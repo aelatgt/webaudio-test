@@ -1,0 +1,58 @@
+<script type="text/javascript">
+ 
+    function loadPlayer() {
+        var audioPlayer = new Audio();
+        audioPlayer.controls="controls";
+        audioPlayer.addEventListener('ended',nextSong,false);
+        audioPlayer.addEventListener('error',errorFallback,true);
+        document.getElementById("player").appendChild(audioPlayer);
+        nextSong();
+    }
+    function nextSong() {
+        if(urls[next]!=undefined) {
+            var audioPlayer = document.getElementsByTagName('audio')[0];
+            if(audioPlayer!=undefined) {
+                audioPlayer.src=urls[next];
+                audioPlayer.load();
+                audioPlayer.play();
+                next++;
+            } else {
+                loadPlayer();
+            }
+        } else {
+            alert('the end!');
+        }
+    }
+    function errorFallback() {
+            alert('error');
+    }
+    function playPause() {
+        var audioPlayer = document.getElementsByTagName('audio')[0];
+        if(audioPlayer!=undefined) {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        } else {
+            loadPlayer();
+        }
+    }
+    function pickSong(num) {
+        next = num;
+        nextSong();
+    }
+ 
+    var urls = new Array();
+    urls[0] = 'sample1.mp3';
+    urls[1] = 'sample2.mp3';
+    var next = 0;
+ 
+</script>
+ 
+<div id="player"></div>
+<a href="#" onclick="playPause()">Play / Pause!</a> |
+<a href="#" onclick="nextSong()">Next!</a><br><br>
+ 
+<a href="#" onclick="pickSong(0)">Sample 1</a><br>
+<a href="#" onclick="pickSong(1)">Sample 2</a><br>

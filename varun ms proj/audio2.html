@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <title>Web Audio App</title>
+	<link rel="apple-touch-icon" href="assets/sample_icon_57x57.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+        <meta name="arenabled" />
+	<h1>Sound Demo</h1>
+	</head>
+	<body>
+	<script src="http://argon.gatech.edu/argon_o.js"></script>
+    <script>
+		var myAppController =
+            {
+                onArgonReady : function()
+                {
+                    
+                },
+				
+                
+                
+            };
+            
+			document.addEventListener("AR.ArgonReadyEvent", myAppController.onArgonReady);
+
+		var ctx; //audio context
+		var buf; //audio buffer
+
+
+		//init the sound system
+		function init() {
+			console.log("in init");
+			try {
+				ctx = new webkitAudioContext(); 
+			} catch(e) {
+				alert('you need webaudio support');
+			}
+		}
+		window.addEventListener('load',init,false);
+
+		//load and decode mp3 file
+		function loadFile() {
+			var req = new XMLHttpRequest();
+			req.open("GET","sounds/sound2.mp3",true);
+			req.responseType = "arraybuffer";
+			req.onload = function() {
+				//decode the loaded data
+				ctx.decodeAudioData(req.response, function(buffer) {
+					buf = buffer;
+				});
+			};
+			req.send();
+		}
+
+		//play the loaded file
+		function play() {
+			//create a source node from the buffer
+			var src = ctx.createBufferSource(); 
+			src.buffer = buf;
+			//connect to the final output node (the speakers)
+			src.connect(ctx.destination);
+			//play immediately
+			src.noteOn(0);
+		}
+	</script>
+	<p style="color: #0000FF; font-size: 24pt">
+		<br>
+		<a href="#" onclick="play()">Play</a>
+		<br>
+	</p>
+</body>
+</html>
